@@ -1,6 +1,6 @@
 <?php
 
-namespace Mpwt\Exceptions;
+namespace MPWT\Exceptions;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

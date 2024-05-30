@@ -1,6 +1,6 @@
 <?php
 
-namespace Mpwt\Exceptions;
+namespace MPWT\Exceptions;
 
 use App\Exceptions\Handler;
 use Illuminate\Http\Request;
