@@ -61,3 +61,40 @@ Generated autoload files
 PSR-4 autoloading configured. Use "namespace Mpwt\Exceptions;" in src/
 Include the Composer autoloader with: require 'vendor/autoload.php';
 ```
+
+## Add Codes to /src
+
+Make sure to use correct `namespace` in each file.
+
+```php
+<?php
+
+namespace Mpwt\Exceptions;
+
+class Handler
+{
+
+}
+```
+
+## Loading Library from local development
+
+In `composer.json` of the root laravel project.
+
+```json
+...
+"autoload": {
+    "psr-4": {
+        "App\\": "app/",
+        ...
+        "Mpwt\\Exceptions\\": "packages/mpwt/exceptions/src/"
+    }
+},
+```
+
+```bash
+composer dump-autoload 
+```
+
+## Loading Library from git repo
+
