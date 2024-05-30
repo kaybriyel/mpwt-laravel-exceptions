@@ -1,0 +1,19 @@
+{
+    "name": "mpwt/exceptions",
+    "description": "MPWT Standard Exception Handling",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mpwt\\Exceptions\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kay Briyel",
+            "email": "kaybriyel@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
