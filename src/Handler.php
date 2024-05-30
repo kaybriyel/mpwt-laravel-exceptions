@@ -11,7 +11,7 @@ trait Handler
 {
 
     use HandleException;
-    
+
     /**
      * Convert an exception into HTML content and store for later review.
      *
@@ -30,12 +30,13 @@ trait Handler
         $this->storeReport($content);
 
         // return json response
-        return match (true) {
-            $th instanceof ValidationException => $this->invalidJson($request, $th),
-            default => response()->json([
+
+        if ($th instanceof ValidationException)
+            return $this->invalidJson($request, $th);
+        else
+            return response()->json([
                 'message' => 'Server Error'
-            ], 500)
-        };
+            ], 500);
     }
 
     /**
@@ -76,9 +77,9 @@ trait Handler
      */
     private function storeReport(string $content)
     {
-        $contextId = app()->has('context_id') ? app()->get('context_id') : time();
+        $contextId = app()->offsetExists('context_id') ? app()->context_id : time();
         $dir = 'exception-reports';
-        
+
         if (!Storage::disk('local')->exists($dir)) {
             Storage::disk('local')->makeDirectory($dir);
         }
