@@ -13,47 +13,60 @@ abstract class ReportIdentifier
     /**
      * @var string app name
      */
-    public $app_name;
+    public $appName;
 
 
     /**
      * @var string error class
      */
-    public $error_class;
+    public $errorClass;
 
     /**
      * @var string error file
      */
-    public $error_file;
+    public $errorFile;
 
     /**
      * @var string error message
      */
-    public $error_message;
+    public $errorMessage;
 
     /**
      * @var int error code
      */
-    public $error_code;
+    public $errorCode;
 
     /**
      * @var string route name
      */
-    public $route_name;
+    public $routeName;
 
     /**
      * @var string finger print
      */
-    public $finger_print;
+    public $fingerPrint;
 
     /**
      * @var string full url
      */
-    public $full_url;
+    public $fullUrl;
 
     /**
-     * @var bool has_app_finger_print
+     * @var bool has app finger print
      */
-    public $has_app_finger_print;
+    public $hasAppFingerPrint;
 
+    /**
+     * Get full filename
+     * 
+     * @return string
+     */
+    public abstract function getFullFileName() : string;
+
+    /**
+     * Get directory
+     * 
+     * @return string
+     */
+    public abstract function getDirectoryName() : string;
 }

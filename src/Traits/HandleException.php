@@ -8,6 +8,15 @@ use Throwable;
 
 trait HandleException
 {
+
+    /**
+     * Create exception handler
+     */
+    private static function createHandler(): Handler
+    {
+        return app(Handler::class);
+    }
+
     /**
      * Handle exception
      *
@@ -19,7 +28,6 @@ trait HandleException
      */
     public static function handleException(Request $request, Throwable $th)
     {
-        $exceptionHandler = new Handler(app());
-        return $exceptionHandler->reportException($request, $th);
+        return static::createHandler()->reportException($request, $th);
     }
 }

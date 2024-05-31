@@ -55,4 +55,14 @@ abstract class Handler extends ExceptionsHandler
      * @return void
      */
     protected abstract function storeReport(ReportIdentifier $identifier, string $content): void;
+
+    /**
+     * Notify bug report via channel
+     * 
+     * @param \MPWT\Exceptions\Contracts\ReportIdentifier $identifier
+     * @param string $content
+     * 
+     * @return void
+     */
+    protected abstract function notify(ReportIdentifier $identifier): void;
 }

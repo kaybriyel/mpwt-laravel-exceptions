@@ -2,9 +2,7 @@
 
 namespace MPWT\Exceptions;
 
-use Error;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
@@ -22,15 +20,17 @@ class Handler extends ContractsHandler
     public function reportException(Request $request, Throwable $th): Response
     {
 
-        // generate report
+        // generate bug report
         $content = $this->generateReport($request, $th);
 
+        // generate identifier
         $identifier = $this->generateIdentifier($request, $th);
 
-        // store debug page
+        // store report
         $this->storeReport($identifier, $content);
 
-        $action = $identifier->route_name;
+        // notify
+        $this->notify($identifier);
 
         // return json response
         return match (true) {
@@ -38,7 +38,7 @@ class Handler extends ContractsHandler
             default => response()->json([
                 'report_id'  => $identifier->id,
                 'messages' => [
-                    "An error has occured while processing $action.",
+                    "An error has occured while processing $identifier->routeName.",
                     "The error report has been sent to our technical team.",
                     "Please be patient."
                 ],
@@ -55,7 +55,7 @@ class Handler extends ContractsHandler
         // enable debug mode
         config(['app.debug' => 1]);
 
-        // get html debug error page content
+        // get html bug report page content
         $content = $this->toIlluminateResponse(
             $this->convertExceptionToResponse($th),
             $th
@@ -70,77 +70,77 @@ class Handler extends ContractsHandler
 
     protected function generateIdentifier(Request $request, Throwable $th): ContractsReportIdentifier
     {
+        $routeName          = $request->route()->getName();
+        $hasAppFingerPrint  = app()->offsetExists('fingerPrint');
+        $appFingerPrint     = $hasAppFingerPrint ? app()->fingerPrint : 0;
 
-        $app_name = env('APP_NAME');
+        $appName            = env('APP_NAME');
+        $routeName          = $routeName ? strtoupper($routeName) : 'YOUR REQUEST';
+        $errorClass         = get_class($th);
+        $errorFile          = $th->getFile() . " " . $th->getLine();
+        $errorMessage       = $th->getMessage();
+        $errorCode          = $th->getCode();
+        $fingerPrint        = $hasAppFingerPrint ? $appFingerPrint : $this->getFingerPrint($request);
+        $fullUrl            =  $request->fullUrl();
 
-        $error_class = get_class($th);
-
-        $error_file = $th->getFile() . " " . $th->getLine();
-
-        $error_message = $th->getMessage();
-
-        $error_code = $th->getCode();
-
-        $route_name = $request->route()->getName();
-        $route_name = $route_name ? strtoupper($route_name) : 'ERROR';
-
-        $app_finger_print = app()->offsetExists('finger_print') ? app()->finger_print : 0;
-
-        $has_app_finger_print = $app_finger_print !== 0;
-
-        $finger_print = $app_finger_print ? $app_finger_print : $this->getFingerPrint($request);
-
-        $full_url =  $request->fullUrl();
-
-        $report_identifier = new ReportIdentifier(
-            $app_name,
-            $route_name,
-            $error_class,
-            $error_file,
-            $error_message,
-            $error_code,
-            $finger_print,
-            $full_url,
-            $has_app_finger_print
+        $reportIdentifier = new ReportIdentifier(
+            $appName,
+            $routeName,
+            $errorClass,
+            $errorFile,
+            $errorMessage,
+            $errorCode,
+            $fingerPrint,
+            $fullUrl,
+            $hasAppFingerPrint
         );
 
-        return $report_identifier;
+        return $reportIdentifier;
     }
 
     protected function storeReport(ContractsReportIdentifier $identifier, string $content): void
     {
         $this->addMPWTAfterResponseCallbacks(function () use ($identifier, $content) {
-            $dir    = 'exception-reports';
-            $name   = $identifier->id;
+            // save bug report to storage, will be deleted after notify
+            file_put_contents($identifier->getFullFileName(), $content);
+        });
+    }
 
-            if (!Storage::disk('local')->exists($dir)) {
-                Storage::disk('local')->makeDirectory($dir);
-            }
-
-            $full_filename = storage_path("app/$dir/$name.html");
-
-            file_put_contents($full_filename, $content);
-
+    protected function notify(ContractsReportIdentifier $identifier) : void
+    {
+        $this->addMPWTAfterResponseCallbacks(function () use ($identifier) {
+            // prepare notify channel
             $token      = 'bot7075135649:AAGGwZNm7C_Vh5mFjEffuseBlTxwdtNDj7U';
             $telegram   = "https://api.telegram.org/$token";
-            $chat_id    = 701891228;
+            $chatId     = 701891228;
 
+            // prepare notify identifier message
             $json = json_encode($identifier, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $text = "```json $json```";
-            $res = json_decode(`curl --location '$telegram/sendMessage' --form 'chat_id=$chat_id' --form 'text=$text' --form 'parse_mode=markdown'`);
 
-            if ($res->ok) {
-                $message_id = $res->result->message_id;
+            // notify
+            $res = `curl --location '$telegram/sendMessage' --form 'chat_id=$chatId' --form 'text=$text' --form 'parse_mode=markdown'`;
+            $json = json_decode($res);
 
-                $error_message = $identifier->error_message;
-                $caption = "$error_message";
+            if ($json->ok) {
+                // will send bug report file to reply to identifier message
+                $messageId = $json->result->message_id;
 
-                $res = json_decode(`curl --location '$telegram/sendDocument?chat_id=$chat_id&parse_mode=markdown' --form 'document=@"$full_filename"' --form 'caption="$caption"' --form 'reply_to_message_id=$message_id'`);
-                if ($res->ok) {
-                    unlink($full_filename);
+                // get file name
+                $fullFilename = $identifier->getFullFileName();
+
+                // prepare caption
+                $caption = $identifier->errorMessage;
+
+                // notify
+                $res = `curl --location '$telegram/sendDocument?chat_id=$chatId&parse_mode=markdown' --form 'document=@"$fullFilename"' --form 'caption="$caption"' --form 'reply_to_message_id=$messageId'`;
+                $json = json_decode($res);
+
+                if ($json->ok) {
+                    // delete bug report file from storage
+                    // unlink($fullFilename);
                 }
             }
         });
     }
-
 }
