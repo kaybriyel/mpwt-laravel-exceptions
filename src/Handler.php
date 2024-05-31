@@ -9,9 +9,8 @@ use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
 use MPWT\Exceptions\Traits\HandleException;
-use MPWT\Exceptions\Traits\HasAfterRepsponseCallback;
-use MPWT\Exceptions\Traits\HasRequestFingerPrint;
-
+use MPWT\Http\Traits\HasAfterRepsponseCallback;
+use MPWT\Http\Traits\HasRequestFingerPrint;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
