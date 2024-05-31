@@ -102,32 +102,32 @@ composer dump-autoload
 
 > POE https://poe.com/s/ZjdYV7XSwCjmhWMLY54w
 
-Yes, that's a good approach. If you want to maintain separate versions of your package for Laravel 7 and Laravel 8, having two branches in a single Git repository is a reasonable solution.
+Yes, that's a good approach. If you want to maintain separate versions of your package for Laravel 5 and Laravel 10, having two branches in a single Git repository is a reasonable solution.
 
 Here's how you can set it up:
 
 1. **Create the Git repository**: Create a new Git repository for your package, e.g., `myvendor/mypackage`.
 
 2. **Create the branches**: Within the repository, create two branches:
-   - `laravel-7`: This branch will contain the code for the Laravel 7 version of your package.
-   - `laravel-8`: This branch will contain the code for the Laravel 8 version of your package.
+   - `laravel-5`: This branch will contain the code for the Laravel 5 version of your package.
+   - `laravel-10`: This branch will contain the code for the Laravel 10 version of your package.
 
 3. **Develop and maintain the branches**: Develop and maintain the code for each Laravel version in the respective branches. Ensure that the code is compatible with the target Laravel version.
 
-4. **Versioning and releases**: When you're ready to release a new version of your package, create a new tag on the appropriate branch (e.g., `v1.0.0` on the `laravel-7` branch, `v2.0.0` on the `laravel-8` branch).
+4. **Versioning and releases**: When you're ready to release a new version of your package, create a new tag on the appropriate branch (e.g., `v1.0.0` on the `laravel-5` branch, `v2.0.0` on the `laravel-10` branch).
 
 5. **Composer configuration**: In your project's `composer.json` file, you can specify the required version of your package based on the Laravel version being used:
 
    ```json
    {
        "require": {
-           "myvendor/mypackage": "^1.0" // For Laravel 7 projects
+           "myvendor/mypackage": "^1.0" // For Laravel 5 projects
        },
        "repositories": [
            {
-               "type": "git",
+               "type": "vcs",
                "url": "https://github.com/myvendor/mypackage.git",
-               "branch": "laravel-7"
+               "branch": "laravel-5"
            }
        ]
    }
@@ -136,13 +136,13 @@ Here's how you can set it up:
    ```json
    {
        "require": {
-           "myvendor/mypackage": "^2.0" // For Laravel 8 projects
+           "myvendor/mypackage": "^2.0" // For Laravel 10 projects
        },
        "repositories": [
            {
                "type": "git",
                "url": "https://github.com/myvendor/mypackage.git",
-               "branch": "laravel-8"
+               "branch": "laravel-10"
            }
        ]
    }
@@ -157,19 +157,19 @@ Remember to update your package's documentation to clearly explain the version r
 
 Sure, here's an example of the Git commands to create and push tags for your package versions:
 
-1. **Create a tag for the Laravel 7 version**:
+1. **Create a tag for the laravel 5 version**:
    ```
-   # Switch to the laravel-7 branch
-   git checkout laravel-7
+   # Switch to the laravel-5 branch
+   git checkout laravel-5
    
    # Create a new tag for version 1.2.3
    git tag v1.2.3
    ```
 
-2. **Create a tag for the Laravel 8 version**:
+2. **Create a tag for the laravel 10 version**:
    ```
-   # Switch to the laravel-8 branch
-   git checkout laravel-8
+   # Switch to the laravel-10 branch
+   git checkout laravel-10
    
    # Create a new tag for version 2.0.0
    git tag v2.0.0
@@ -184,10 +184,10 @@ Sure, here's an example of the Git commands to create and push tags for your pac
 
 Here's a breakdown of the commands:
 
-- `git checkout laravel-7`: Switches to the `laravel-7` branch.
-- `git tag v1.2.3`: Creates a new tag named `v1.2.3` on the current branch (in this case, `laravel-7`).
-- `git checkout laravel-8`: Switches to the `laravel-8` branch.
-- `git tag v2.0.0`: Creates a new tag named `v2.0.0` on the current branch (in this case, `laravel-8`).
+- `git checkout laravel-5`: Switches to the `laravel-5` branch.
+- `git tag v1.2.3`: Creates a new tag named `v1.2.3` on the current branch (in this case, `laravel-5`).
+- `git checkout laravel-10`: Switches to the `laravel-10` branch.
+- `git tag v2.0.0`: Creates a new tag named `v2.0.0` on the current branch (in this case, `laravel-10`).
 - `git push origin v1.2.3`: Pushes the `v1.2.3` tag to the remote repository.
 - `git push origin v2.0.0`: Pushes the `v2.0.0` tag to the remote repository.
 
