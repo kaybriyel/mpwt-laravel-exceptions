@@ -1,9 +1,9 @@
 <?php
 
-namespace MPWT\Exceptions;
+namespace MPWT\Exceptions\Traits;
 
-use App\Exceptions\Handler;
 use Illuminate\Http\Request;
+use MPWT\Exceptions\Handler;
 use Throwable;
 
 trait HandleException
@@ -19,7 +19,7 @@ trait HandleException
      */
     public static function handleException(Request $request, Throwable $th)
     {
-        $exceptionHandler = app(Handler::class);
+        $exceptionHandler = new Handler(app());
         return $exceptionHandler->reportException($request, $th);
     }
 }

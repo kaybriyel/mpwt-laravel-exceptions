@@ -3,28 +3,20 @@
 namespace MPWT\Exceptions;
 
 use Illuminate\Http\Request;
+use MPWT\Exceptions\Contracts\RequestFingerPrint as ContractsRequestFingerPrint;
 
-abstract class RequestFingerPrint
+class RequestFingerPrint implements ContractsRequestFingerPrint
 {
 
-    /**
-     * Generate request unique identfier
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * @return string|false
-     *
-     * @throws \Throwable
-     */
-    public static function unique(Request $request)
+    public function unique(Request $request): string
     {
-        
         return sha1(json_encode([
-            self::captureFull($request)
+            $this->convertToArray($request)
         ]));
     }
 
-    public static function captureFull(Request $request) : array {
+    public function convertToArray(Request $request): array
+    {
         return [
             'userAgent' => $request->userAgent(),
             'ip'        => $request->ip(),

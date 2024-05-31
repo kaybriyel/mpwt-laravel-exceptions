@@ -2,11 +2,12 @@
 
 namespace MPWT\Exceptions\Contracts;
 
+use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-trait Handler
+abstract class Handler extends ExceptionsHandler
 {
 
     /**
@@ -54,5 +55,4 @@ trait Handler
      * @return void
      */
     protected abstract function storeReport(ReportIdentifier $identifier, string $content): void;
-
 }

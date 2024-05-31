@@ -2,31 +2,25 @@
 
 namespace MPWT\Exceptions;
 
-use App\Http\Middleware\LogMiddleware;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
+use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
+use MPWT\Exceptions\Traits\HandleException;
+use MPWT\Exceptions\Traits\HasAfterRepsponseCallback;
+use MPWT\Exceptions\Traits\HasRequestFingerPrint;
+use MPWT\Exceptions\Traits\Laravel10Method;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-trait Handler
+class Handler extends ContractsHandler
 {
 
-    use ContractsHandler, HandleException, HasAfterRepsponseCallback;
+    use HandleException, HasAfterRepsponseCallback, HasRequestFingerPrint, Laravel10Method;
 
-    /**
-     * Convert an exception into HTML content and store for later review.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $th
-     * 
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Throwable
-     */
     public function reportException(Request $request, Throwable $th): Response
     {
         $e = $th instanceof Error ? new FatalThrowableError($th) : $th;
@@ -55,16 +49,6 @@ trait Handler
             ], 500);
     }
 
-    /**
-     * Convert an exception into HTML content
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * 
-     * @return string|false
-     *
-     * @throws \Throwable
-     */
     protected function generateReport(Request $request, Throwable $th)
     {
         // get configured debug mode
@@ -86,15 +70,7 @@ trait Handler
         return $content;
     }
 
-    /**
-     * Generate report identifer
-     * 
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * 
-     * @return \MPWT\Exceptions\Contracts\ReportIdentifier
-     */
-    protected function generateIdentifier(Request $request, Throwable $th): ReportIdentifier
+    protected function generateIdentifier(Request $request, Throwable $th): ContractsReportIdentifier
     {
 
         $app_name = env('APP_NAME');
@@ -114,7 +90,7 @@ trait Handler
 
         $has_app_finger_print = $app_finger_print !== 0;
 
-        $finger_print = $app_finger_print ? $app_finger_print : RequestFingerPrint::unique($request);
+        $finger_print = $app_finger_print ? $app_finger_print : $this->getFingerPrint($request);
 
         $full_url =  $request->fullUrl();
 
@@ -133,26 +109,18 @@ trait Handler
         return $report_identifier;
     }
 
-    /**
-     * Save the generated HTML content
-     * 
-     * @param \MPWT\Exceptions\Contracts\ReportIdentifier $identifier
-     * @param string $content
-     * 
-     * @return void
-     */
-    protected function storeReport(ReportIdentifier $identifier, string $content): void
+    protected function storeReport(ContractsReportIdentifier $identifier, string $content): void
     {
         $this->addMPWTAfterResponseCallbacks(function () use ($identifier, $content) {
             $dir    = 'exception-reports';
             $name   = $identifier->id;
-    
+
             if (!Storage::disk('local')->exists($dir)) {
                 Storage::disk('local')->makeDirectory($dir);
             }
-    
+
             $full_filename = storage_path("app/$dir/$name.html");
-    
+
             file_put_contents($full_filename, $content);
 
             $token      = 'bot7075135649:AAGGwZNm7C_Vh5mFjEffuseBlTxwdtNDj7U';
@@ -176,4 +144,5 @@ trait Handler
             }
         });
     }
+
 }

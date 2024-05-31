@@ -1,6 +1,8 @@
 <?php
 
-namespace MPWT\Exceptions;
+namespace MPWT\Exceptions\Traits;
+
+use MPWT\Exceptions\AfterRepsponseCallback;
 
 trait HasAfterRepsponseCallback
 {
