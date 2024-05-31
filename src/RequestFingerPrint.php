@@ -29,7 +29,7 @@ abstract class RequestFingerPrint
             'userAgent' => $request->userAgent(),
             'ip'        => $request->ip(),
             'clientIP'  => $request->getClientIp(),
-            'timestamp' => time(),
+            'timestamp' => $request->server('REQUEST_TIME'),
             'fullUrl'   => $request->fullUrl(),
             'method'    => $request->method(),
             'headers'   => $request->headers->all(),
