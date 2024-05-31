@@ -15,7 +15,7 @@ use Throwable;
 trait Handler
 {
 
-    use ContractsHandler, HandleException;
+    use ContractsHandler, HandleException, HasAfterRepsponseCallback;
 
     /**
      * Convert an exception into HTML content and store for later review.
@@ -143,42 +143,37 @@ trait Handler
      */
     protected function storeReport(ReportIdentifier $identifier, string $content): void
     {
+        $this->addMPWTAfterResponseCallbacks(function () use ($identifier, $content) {
+            $dir    = 'exception-reports';
+            $name   = $identifier->id;
+    
+            if (!Storage::disk('local')->exists($dir)) {
+                Storage::disk('local')->makeDirectory($dir);
+            }
+    
+            $full_filename = storage_path("app/$dir/$name.html");
+    
+            file_put_contents($full_filename, $content);
 
-        $dir    = 'exception-reports';
-        $name   = $identifier->id;
+            $token      = 'bot7075135649:AAGGwZNm7C_Vh5mFjEffuseBlTxwdtNDj7U';
+            $telegram   = "https://api.telegram.org/$token";
+            $chat_id    = 701891228;
 
-        if (!Storage::disk('local')->exists($dir)) {
-            Storage::disk('local')->makeDirectory($dir);
-        }
+            $json = json_encode($identifier, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $text = "```json $json```";
+            $res = json_decode(`curl --location '$telegram/sendMessage' --form 'chat_id=$chat_id' --form 'text=$text' --form 'parse_mode=markdown'`);
 
-        $full_filename = storage_path("app/$dir/$name.html");
+            if ($res->ok) {
+                $message_id = $res->result->message_id;
 
-        file_put_contents($full_filename, $content);
-        
-        $middleware = app(LogMiddleware::class);
-        
-        if ($middleware) {
-            $middleware->addTerminateCallbacks(function () use ($full_filename, $identifier) {
-                $token      = 'bot7075135649:AAGGwZNm7C_Vh5mFjEffuseBlTxwdtNDj7U';
-                $telegram   = "https://api.telegram.org/$token";
-                $chat_id    = 701891228;
+                $error_message = $identifier->error_message;
+                $caption = "$error_message";
 
-                $json = json_encode($identifier, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
-                $text = "```json $json```";
-                $res = json_decode(`curl --location '$telegram/sendMessage' --form 'chat_id=$chat_id' --form 'text=$text' --form 'parse_mode=markdown'`);
-
-                if($res->ok) {
-                    $message_id = $res->result->message_id;
-
-                    $error_message = $identifier->error_message;
-                    $caption = "$error_message";
-                    
-                    $res = json_decode(`curl --location '$telegram/sendDocument?chat_id=$chat_id&parse_mode=markdown' --form 'document=@"$full_filename"' --form 'caption="$caption"' --form 'reply_to_message_id=$message_id'`);
-                    if($res->ok) {
-                        unlink($full_filename);
-                    }
+                $res = json_decode(`curl --location '$telegram/sendDocument?chat_id=$chat_id&parse_mode=markdown' --form 'document=@"$full_filename"' --form 'caption="$caption"' --form 'reply_to_message_id=$message_id'`);
+                if ($res->ok) {
+                    unlink($full_filename);
                 }
-            });
-        }
+            }
+        });
     }
 }
