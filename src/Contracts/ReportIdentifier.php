@@ -5,7 +5,7 @@ namespace MPWT\Exceptions\Contracts;
 abstract class ReportIdentifier
 {
     /**
-     * @var id report id
+     * @var string report id
      */
 
     public $id;
@@ -57,16 +57,16 @@ abstract class ReportIdentifier
     public $hasAppFingerPrint;
 
     /**
-     * Get full filename
-     * 
+     * Get report full filename
+     *
      * @return string
      */
-    public abstract function getFullFileName() : string;
+    abstract public function getFullFileName(): string;
 
     /**
-     * Get directory
-     * 
+     * Get report directory
+     *
      * @return string
      */
-    public abstract function getDirectoryName() : string;
+    abstract public function getDirectoryName(): string;
 }

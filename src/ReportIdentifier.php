@@ -4,32 +4,12 @@ namespace MPWT\Exceptions;
 
 use Illuminate\Support\Facades\Storage;
 use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
+use MPWT\Utils\Constants\Env;
 
-class ReportIdentifier extends ContractsReportIdentifier
+class ReportIdentifier extends ContractsReportIdentifier implements Env
 {
-
-    function __construct(
-        string $appName,
-        string $routeName,
-        string $errorClass,
-        string $errorFile,
-        string $errorMessage,
-        int $errorCode,
-        string $fingerPrint,
-        string $fullUrl,
-        bool $hasAppFingerPrint
-    ) {
-        $this->id               = hash('crc32', $fingerPrint);
-        $this->appName         = $appName;
-        $this->routeName       = $routeName;
-        $this->errorClass      = $errorClass;
-        $this->errorFile       = $errorFile;
-        $this->errorMessage    = $errorMessage;
-        $this->errorCode       = $errorCode;
-        $this->fingerPrint     = $fingerPrint;
-        $this->fullUrl         = $fullUrl;
-        $this->hasAppFingerPrint = $hasAppFingerPrint;
-    }
+    public const DEFAULT_DIR        = 'exception-reports';
+    public const DEFAULT_STORAGE    = 'local';
 
     public function getFullFileName(): string
     {
@@ -39,10 +19,11 @@ class ReportIdentifier extends ContractsReportIdentifier
 
     public function getDirectoryName(): string
     {
-        $folder = 'exception-reports';
+        $storage    = Storage::disk(env(static::EXCEPTION_REPORT_STORAGE, static::DEFAULT_STORAGE));
+        $folder     = env(static::EXCEPTION_REPORT_DIR, static::DEFAULT_DIR);
 
-        if (!Storage::disk('local')->exists($folder)) {
-            Storage::disk('local')->makeDirectory($folder);
+        if (!$storage->exists($folder)) {
+            $storage->makeDirectory($folder);
         }
 
         return "app/$folder";
