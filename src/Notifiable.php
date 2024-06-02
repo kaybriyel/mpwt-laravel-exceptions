@@ -14,10 +14,10 @@ trait Notifiable
     public function notify(NotifyChannel $channel, array $form): ?string
     {
         $form = $channel->prepareForm($form);
-        return match ($channel->withAttachment) {
-            true    => $channel->sendAttachment($form),
-            default => $channel->sendMessage($form)
-        };
+        if ($channel->withAttachment) {
+            return $channel->sendAttachment($form);
+        }
+        return $channel->sendMessage($form);
     }
 
     /**
@@ -31,10 +31,10 @@ trait Notifiable
      */
     public function channel(string $name, string $token): NotifyChannel
     {
-        return match ($name) {
-            'telegram'  => $this->telegram($token),
-            default     => $this->telegram($token)
-        };
+        if ($name === 'telegram') {
+            return $this->telegram($token);
+        }
+        return $this->telegram($token);
     }
 
     /**

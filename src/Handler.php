@@ -6,12 +6,13 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
 use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
+use MPWT\Exceptions\Supports\Laravel10Method;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionsHandler
 {
-    use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport;
+    use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport, Laravel10Method;
 
     /**
      * Report exception
@@ -42,10 +43,11 @@ class Handler extends ExceptionsHandler
         });
 
         // return reasonable json response
-        return match (true) {
-            $th instanceof ValidationException => $this->invalidJson($request, $th),
-            default => $this->reasonableResponse($identifier)
-        };
+        if ($th instanceof ValidationException) {
+            return $this->invalidJson($request, $th);
+        }
+
+        return $this->reasonableResponse($identifier);
     }
 
     /**

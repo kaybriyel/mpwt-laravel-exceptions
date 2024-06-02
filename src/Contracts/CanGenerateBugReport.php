@@ -17,7 +17,7 @@ trait CanGenerateBugReport
      *
      * @throws \Throwable
      */
-    abstract protected function generateReport(Request $request, Throwable $th): string|bool;
+    abstract protected function generateReport(Request $request, Throwable $th): ?string;
 
     /**
      * Generate report identifer

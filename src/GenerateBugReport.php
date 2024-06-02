@@ -51,7 +51,7 @@ trait GenerateBugReport
      *
      * @throws \Throwable
      */
-    protected function generateReport(Request $request, Throwable $th): string|bool
+    protected function generateReport(Request $request, Throwable $th): ?string
     {
         // get configured debug mode
         $originalState = config(General::APP_DEBUG);
