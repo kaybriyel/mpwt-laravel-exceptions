@@ -7,14 +7,13 @@ use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class Handler extends ExceptionsHandler
 {
     use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport;
 
     /** {@inheritdoc} */
-    public function handle(Throwable $th): Response
+    public function handle(\Throwable $th): Response
     {
         $request = request();
 

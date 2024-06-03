@@ -8,14 +8,13 @@ use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
 use MPWT\Exceptions\ReportIdentifier;
 use MPWT\Utils\Constants\Env;
 use MPWT\Utils\Constants\General;
-use Throwable;
 
 trait GenerateBugReport
 {
     use CanGenerateBugReport;
     
     /** {@inheritdoc} */
-    protected function generateIdentifier(Request $request, Throwable $th): ContractsReportIdentifier
+    protected function generateIdentifier(Request $request, \Throwable $th): ContractsReportIdentifier
     {
         $routeName          = $request->route()->getName();
         $hasAppFingerPrint  = app()->offsetExists(General::FINGER_PRINT);
@@ -37,7 +36,7 @@ trait GenerateBugReport
     }
 
     /** {@inheritdoc} */
-    protected function generateReport(Request $request, Throwable $th): string|bool
+    protected function generateReport(Request $request, \Throwable $th): ?string
     {
         // get configured debug mode
         $originalState = config(General::APP_DEBUG);
