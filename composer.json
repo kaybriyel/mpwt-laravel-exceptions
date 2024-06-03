@@ -15,5 +15,27 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "mpwt/http": "^1.0.0",
+        "mpwt/utils": "^1.0.0"
+    },
+    "require-dev": {
+        "laravel/framework": "5.4.x",
+        "phpstan/phpstan": "2.0.x-dev"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/kaybriyel/mpwt-laravel-http.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/kaybriyel/mpwt-laravel-utils.git"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    }
 }
