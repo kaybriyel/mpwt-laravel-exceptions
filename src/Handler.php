@@ -13,15 +13,7 @@ class Handler extends ExceptionsHandler
 {
     use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport;
 
-    /**
-     * Report exception
-     *
-     * @param  \Throwable  $th
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Throwable
-     */
+    /** {@inheritdoc} */
     public function handle(Throwable $th): Response
     {
         $request = request();
@@ -48,12 +40,7 @@ class Handler extends ExceptionsHandler
         };
     }
 
-    /**
-     * Response short meaningful message
-     *
-     * @param \MPWT\Exceptions\Contracts\ReportIdentifier $identifier
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
+    /** {@inheritdoc} */
     protected function reasonableResponse(ReportIdentifier $identifier): Response
     {
         return response()->json([

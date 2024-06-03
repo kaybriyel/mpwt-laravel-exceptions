@@ -3,20 +3,14 @@
 namespace MPWT\Exceptions;
 
 use Illuminate\Support\Facades\Log;
+use MPWT\Exceptions\Contracts\CanNotifyBugReport;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
 
 trait NotifyBugReport
 {
-    use Notifiable;
+    use CanNotifyBugReport, Notifiable;
 
-    /**
-     * Notify bug report via channel
-     *
-     * @param \MPWT\Exceptions\Contracts\ReportIdentifier $identifier
-     * @param string $content
-     *
-     * @return void
-     */
+    /** {@inheritdoc} */
     protected function notifyBugReport(ReportIdentifier $identifier): void
     {
         $channel    = $this->channel('telegram', 'bot7075135649:AAGGwZNm7C_Vh5mFjEffuseBlTxwdtNDj7U');
@@ -43,9 +37,6 @@ trait NotifyBugReport
             // get file name
             $fullFilename = $identifier->getFullFileName();
 
-            // prepare channel
-            $channel->withAttachment = true;
-
             // prepare message
             $form = [
                 "chat_id=$reciever",
@@ -56,7 +47,7 @@ trait NotifyBugReport
             ];
 
             // send bug report file
-            $res = $this->notify($channel, $form);
+            $res = $this->notify($channel, $form, true);
             $json = json_decode($res);
 
             if ($json && $json->ok) {
