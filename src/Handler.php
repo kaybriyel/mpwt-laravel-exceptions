@@ -8,14 +8,13 @@ use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
 use MPWT\Exceptions\Supports\Laravel10Method;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class Handler extends ExceptionsHandler
 {
     use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport, Laravel10Method;
 
     /** {@inheritdoc} */
-    public function handle(Throwable $th): Response
+    public function handle(\Throwable $th): Response
     {
         $request = request();
 

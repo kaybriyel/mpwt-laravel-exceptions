@@ -3,7 +3,6 @@
 namespace MPWT\Exceptions\Contracts;
 
 use Illuminate\Http\Request;
-use Throwable;
 
 trait CanGenerateBugReport
 {
@@ -17,7 +16,7 @@ trait CanGenerateBugReport
      *
      * @throws \Throwable
      */
-    abstract protected function generateReport(Request $request, Throwable $th): ?string;
+    abstract protected function generateReport(Request $request, \Throwable $th): ?string;
 
     /**
      * Generate report identifer
@@ -27,7 +26,7 @@ trait CanGenerateBugReport
      *
      * @return \MPWT\Exceptions\Contracts\ReportIdentifier
      */
-    abstract protected function generateIdentifier(Request $request, Throwable $th): ReportIdentifier;
+    abstract protected function generateIdentifier(Request $request, \Throwable $th): ReportIdentifier;
 
     /**
      * Save the generated HTML content

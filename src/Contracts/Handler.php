@@ -4,7 +4,6 @@ namespace MPWT\Exceptions\Contracts;
 
 use MPWT\Http\Traits\HasRequestFingerPrint;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 trait Handler
 {
@@ -19,7 +18,7 @@ trait Handler
      *
      * @throws \Throwable
      */
-    abstract public static function handleException(Throwable $th): Response;
+    abstract public static function handleException(\Throwable $th): Response;
 
     /**
      * Handle exception
@@ -30,5 +29,5 @@ trait Handler
      *
      * @throws \Throwable
      */
-    abstract public function handle(Throwable $th): Response;
+    abstract public function handle(\Throwable $th): Response;
 }
