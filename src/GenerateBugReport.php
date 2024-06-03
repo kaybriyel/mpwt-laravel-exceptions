@@ -3,6 +3,7 @@
 namespace MPWT\Exceptions;
 
 use Illuminate\Http\Request;
+use MPWT\Exceptions\Contracts\CanGenerateBugReport;
 use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
 use MPWT\Exceptions\ReportIdentifier;
 use MPWT\Utils\Constants\Env;
@@ -11,46 +12,31 @@ use Throwable;
 
 trait GenerateBugReport
 {
-    /**
-     * Generate report identifer
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $th
-     *
-     * @return \MPWT\Exceptions\Contracts\ReportIdentifier
-     */
+    use CanGenerateBugReport;
+    
+    /** {@inheritdoc} */
     protected function generateIdentifier(Request $request, Throwable $th): ContractsReportIdentifier
     {
-        $rdi = new ReportIdentifier;
-
         $routeName          = $request->route()->getName();
         $hasAppFingerPrint  = app()->offsetExists(General::FINGER_PRINT);
         $appFingerPrint     = $hasAppFingerPrint ? app()->fingerPrint : 0;
-
-        $rdi->id            = crc32($appFingerPrint);
-        $rdi->appName       = env(Env::APP_NAME);
-        $rdi->routeName     = $routeName ? strtoupper($routeName) : 'YOUR REQUEST';
-        $rdi->fingerPrint   = $hasAppFingerPrint ? $appFingerPrint : $this->getFingerPrint($request);
-        $rdi->fullUrl       = $request->fullUrl();
-        $rdi->errorClass    = relative_path(get_class($th));
-        $rdi->errorFile     = relative_path($th->getFile()) . " " . $th->getLine();
-        $rdi->errorMessage  = $th->getMessage();
-        $rdi->errorCode     = $th->getCode();
-        $rdi->hasAppFingerPrint = $hasAppFingerPrint;
+        
+        $rdi = new ReportIdentifier();
+        $rdi->setId(crc32($appFingerPrint));
+        $rdi->setAppName(env(Env::APP_NAME));
+        $rdi->setRouteName($routeName ? strtoupper($routeName) : 'YOUR REQUEST');
+        $rdi->setFingerPrint($hasAppFingerPrint ? $appFingerPrint : $rdi->getFingerPrint($request));
+        $rdi->setFullUrl($request->fullUrl());
+        $rdi->setErrorClass(relative_path(get_class($th)));
+        $rdi->setErrorFile(relative_path($th->getFile()) . " " . $th->getLine());
+        $rdi->setErrorMessage($th->getMessage());
+        $rdi->setErrorCode($th->getCode());
+        $rdi->setHasAppFingerPrint($hasAppFingerPrint);
 
         return $rdi;
     }
 
-    /**
-     * Convert an exception into HTML content
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $th
-     *
-     * @return string|false
-     *
-     * @throws \Throwable
-     */
+    /** {@inheritdoc} */
     protected function generateReport(Request $request, Throwable $th): ?string
     {
         // get configured debug mode
@@ -72,14 +58,7 @@ trait GenerateBugReport
         return $content;
     }
 
-    /**
-     * Save the generated HTML content
-     *
-     * @param \MPWT\Exceptions\Contracts\ReportIdentifier $identifier
-     * @param string $content
-     *
-     * @return void
-     */
+    /** {@inheritdoc} */
     protected function storeReport(ContractsReportIdentifier $identifier, string $content): void
     {
         // save bug report to storage

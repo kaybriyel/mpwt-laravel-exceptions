@@ -11,12 +11,14 @@ class ReportIdentifier extends ContractsReportIdentifier implements Env
     public const DEFAULT_DIR        = 'exception-reports';
     public const DEFAULT_STORAGE    = 'local';
 
+    /** {@inheritdoc} */
     public function getFullFileName(): string
     {
         $dir = $this->getDirectoryName();
         return storage_path("$dir/$this->id.html");
     }
 
+    /** {@inheritdoc} */
     public function getDirectoryName(): string
     {
         $storage    = Storage::disk(env(static::EXCEPTION_REPORT_STORAGE, static::DEFAULT_STORAGE));

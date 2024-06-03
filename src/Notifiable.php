@@ -2,33 +2,24 @@
 
 namespace MPWT\Exceptions;
 
+use MPWT\Exceptions\Contracts\CanNotify;
 use MPWT\Exceptions\Contracts\NotifyChannel;
 
 trait Notifiable
 {
-    /**
-     * Send notification to channel
-     *
-     * @param \MPWT\Exceptions\Contracts\NotifyChannel $channel
-     */
-    public function notify(NotifyChannel $channel, array $form): ?string
+    use CanNotify;
+    
+    /** {@inheritdoc} */
+    public function notify(NotifyChannel $channel, array $form, bool $withAttachment = false): ?string
     {
         $form = $channel->prepareForm($form);
-        if ($channel->withAttachment) {
+        if ($withAttachment) {
             return $channel->sendAttachment($form);
         }
         return $channel->sendMessage($form);
     }
 
-    /**
-     * Get channel for sending message
-     *
-     * @param string $name channel name
-     *
-     * @param string $token
-     *
-     * @return NotifyChannel
-     */
+    /** {@inheritdoc} */
     public function channel(string $name, string $token): NotifyChannel
     {
         if ($name === 'telegram') {
@@ -37,11 +28,7 @@ trait Notifiable
         return $this->telegram($token);
     }
 
-    /**
-     * Telegram channel
-     *
-     * @param string $token
-     */
+    /** {@inheritdoc} */
     private function telegram(string $token)
     {
         // prepare channel
@@ -53,7 +40,7 @@ trait Notifiable
             {
                 return '--form ' . implode(' --form ', $form);
             }
-            
+
             public function sendAttachment(string $form)
             {
                 return `curl --location '$this->url/sendDocument' $form`;
