@@ -1,11 +1,15 @@
 <?php
 
-namespace MPWT\Exceptions\Contracts;
+namespace MPWT\Exceptions\Contracts\Traits;
 
 use Illuminate\Http\Request;
+use MPWT\Exceptions\Contracts\ReportIdentifier;
+use MPWT\Http\Traits\HasRequestFingerPrint;
 
 trait CanGenerateBugReport
 {
+    use HasRequestFingerPrint;
+    
     /**
      * Convert an exception into HTML content
      *

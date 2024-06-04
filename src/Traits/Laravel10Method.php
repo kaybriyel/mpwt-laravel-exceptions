@@ -1,6 +1,6 @@
 <?php
 
-namespace MPWT\Exceptions\Supports;
+namespace MPWT\Exceptions\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +17,6 @@ trait Laravel10Method
      */
     private function invalidJson(Request $request, ValidationException $exception)
     {
-
         return response()->json([
             'message' => $this->summarize($exception->validator),
             'errors' => $exception->validator->getMessageBag(),
