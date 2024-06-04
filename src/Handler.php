@@ -2,15 +2,19 @@
 
 namespace MPWT\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use MPWT\Exceptions\Contracts\Handler as ContractsHandler;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
+use MPWT\Exceptions\Traits\CanHandleException;
+use MPWT\Exceptions\Traits\GenerateBugReport;
+use MPWT\Exceptions\Traits\NotifyBugReport;
+use MPWT\Http\Traits\CanExecuteAfterResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class Handler extends ExceptionsHandler
+class Handler extends ContractsHandler
 {
-    use ContractsHandler, HandleException, GenerateBugReport, NotifyBugReport;
+    use GenerateBugReport, NotifyBugReport, CanExecuteAfterResponse;
 
     /** {@inheritdoc} */
     public function handle(\Throwable $th): Response
@@ -21,6 +25,18 @@ class Handler extends ExceptionsHandler
         $identifier = $this->generateIdentifier($request, $th);
 
         // process later after response
+        $this->handleAfterResponse($identifier, $request, $th);
+
+        // return reasonable json response
+        return match (true) {
+            $th instanceof ValidationException => $this->invalidJson($request, $th),
+            default => $this->reasonableResponse($identifier)
+        };
+    }
+
+    /** {@inheritdoc} */
+    protected function handleAfterResponse(ReportIdentifier $identifier, Request $request, \Throwable $th): void
+    {
         $this->addMPWTAfterResponseCallbacks(function () use ($identifier, $request, $th) {
             // generate bug report
             $content = $this->generateReport($request, $th);
@@ -31,12 +47,6 @@ class Handler extends ExceptionsHandler
             // notify
             $this->notifyBugReport($identifier);
         });
-
-        // return reasonable json response
-        return match (true) {
-            $th instanceof ValidationException => $this->invalidJson($request, $th),
-            default => $this->reasonableResponse($identifier)
-        };
     }
 
     /** {@inheritdoc} */

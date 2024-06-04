@@ -1,8 +1,8 @@
 <?php
 
-namespace MPWT\Exceptions\Contracts\ReportIdentifer;
+namespace MPWT\Exceptions\Contracts\Traits;
 
-trait Setter
+trait ReportIdentifierSetter
 {
     /** Set the report id.
      *

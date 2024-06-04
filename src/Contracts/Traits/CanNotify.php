@@ -1,13 +1,13 @@
 <?php
 
-namespace MPWT\Exceptions\Contracts;
+namespace MPWT\Exceptions\Contracts\Traits;
 
 trait CanNotify
 {
     /**
      * Send notification to channel
      *
-     * @param \MPWT\Exceptions\Contracts\NotifyChannel $channel
+     * @param \MPWT\Exceptions\Contracts\Traits\NotifyChannel $channel
      */
     abstract public function notify(NotifyChannel $channel, array $form, bool $withAttachment = false): ?string;
 
@@ -18,7 +18,7 @@ trait CanNotify
      *
      * @param string $token
      *
-     * @return NotifyChannel
+     * @return \MPWT\Exceptions\Contracts\Traits\NotifyChannel
      */
     abstract public function channel(string $name, string $token): NotifyChannel;
 }

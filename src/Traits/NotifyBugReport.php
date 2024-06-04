@@ -1,9 +1,9 @@
 <?php
 
-namespace MPWT\Exceptions;
+namespace MPWT\Exceptions\Traits;
 
 use Illuminate\Support\Facades\Log;
-use MPWT\Exceptions\Contracts\CanNotifyBugReport;
+use MPWT\Exceptions\Contracts\Traits\CanNotifyBugReport;
 use MPWT\Exceptions\Contracts\ReportIdentifier;
 
 trait NotifyBugReport

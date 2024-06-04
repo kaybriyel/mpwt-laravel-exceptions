@@ -1,9 +1,9 @@
 <?php
 
-namespace MPWT\Exceptions;
+namespace MPWT\Exceptions\Traits;
 
 use Illuminate\Http\Request;
-use MPWT\Exceptions\Contracts\CanGenerateBugReport;
+use MPWT\Exceptions\Contracts\Traits\CanGenerateBugReport;
 use MPWT\Exceptions\Contracts\ReportIdentifier as ContractsReportIdentifier;
 use MPWT\Exceptions\ReportIdentifier;
 use MPWT\Utils\Constants\Env;
@@ -24,7 +24,7 @@ trait GenerateBugReport
         $rdi->setId(crc32($appFingerPrint));
         $rdi->setAppName(env(Env::APP_NAME));
         $rdi->setRouteName($routeName ? strtoupper($routeName) : 'YOUR REQUEST');
-        $rdi->setFingerPrint($hasAppFingerPrint ? $appFingerPrint : $rdi->getFingerPrint($request));
+        $rdi->setFingerPrint($hasAppFingerPrint ? $appFingerPrint : $this->getFingerPrint($request));
         $rdi->setFullUrl($request->fullUrl());
         $rdi->setErrorClass(relative_path(get_class($th)));
         $rdi->setErrorFile(relative_path($th->getFile()) . " " . $th->getLine());

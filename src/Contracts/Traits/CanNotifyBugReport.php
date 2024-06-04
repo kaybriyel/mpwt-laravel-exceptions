@@ -1,6 +1,8 @@
 <?php
 
-namespace MPWT\Exceptions\Contracts;
+namespace MPWT\Exceptions\Contracts\Traits;
+
+use MPWT\Exceptions\Contracts\ReportIdentifier;
 
 trait CanNotifyBugReport
 {

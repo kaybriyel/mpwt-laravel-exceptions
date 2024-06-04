@@ -2,12 +2,12 @@
 
 namespace MPWT\Exceptions\Contracts;
 
-use MPWT\Exceptions\Contracts\ReportIdentifer\Getter;
-use MPWT\Exceptions\Contracts\ReportIdentifer\Setter;
+use MPWT\Exceptions\Contracts\Traits\ReportIdentifierGetter;
+use MPWT\Exceptions\Contracts\Traits\ReportIdentifierSetter;
 
 abstract class ReportIdentifier
 {
-    use Getter, Setter;
+    use ReportIdentifierGetter, ReportIdentifierSetter;
     
     /** @var string $id report id */
     public $id;
